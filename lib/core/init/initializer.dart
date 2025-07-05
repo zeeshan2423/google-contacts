@@ -1,0 +1,19 @@
+import 'package:google_contacts/core/constants/imports.dart';
+
+class AppInitializer {
+  const AppInitializer._();
+
+  static Future<void> initialize() async {
+    WidgetsFlutterBinding.ensureInitialized();
+
+    await init();
+
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
+    Bloc.observer = AppBlocObserver();
+
+    await DatabaseService.database;
+  }
+}

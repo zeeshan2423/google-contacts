@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "947406254230",
+    "project_id": "contacts-c8880",
+    "storage_bucket": "contacts-c8880.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:947406254230:android:10093a00beeb733ab252b7",
+        "android_client_info": {
+          "package_name": "com.assignment.google.contacts.google_contacts"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgveUK787iJbZKOY4p9nisi4SX3CRQ5BA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

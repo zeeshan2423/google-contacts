@@ -17,6 +17,8 @@ export 'package:google_contacts/core/debug/bloc_observer.dart';
 export 'package:google_contacts/core/enums/pages.dart';
 export 'package:google_contacts/core/errors/exception.dart';
 export 'package:google_contacts/core/errors/failure.dart';
+export 'package:google_contacts/core/extensions/context_extension.dart';
+export 'package:google_contacts/core/helpers/search_delegate.dart';
 export 'package:google_contacts/core/init/initializer.dart';
 export 'package:google_contacts/core/services/database.dart';
 export 'package:google_contacts/core/services/injection_container.dart';

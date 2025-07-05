@@ -7,8 +7,14 @@ class ContactsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = context.theme.colorScheme;
     final textTheme = context.theme.textTheme;
+
     return Scaffold(
-      floatingActionButton: FloatingActionButton(onPressed: () {}),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          context.goNamed(PAGES.createContact.screenName);
+        },
+        child: Icon(Icons.add, color: colorScheme.primary),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -50,6 +56,30 @@ class ContactsPage extends StatelessWidget {
                       ),
                     ],
                   ),
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 36,
+                  children: [
+                    Lottie.asset(
+                      AppTheme.isDarkMode.value
+                          ? AppAssets.vaseNight
+                          : AppAssets.vase,
+                      repeat: false,
+                      frameRate: const FrameRate(60),
+                      animate: true,
+                      height: 156,
+                    ),
+                    Text(
+                      'No contacts yet',
+                      style: textTheme.titleLarge?.copyWith(
+                        color: colorScheme.onSurface,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],

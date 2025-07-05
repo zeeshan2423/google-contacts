@@ -8,7 +8,7 @@ class AppTheme {
   );
 
   static final lightTheme = ThemeData(
-    colorSchemeSeed: const Color(0xFF0057CC),
+    colorSchemeSeed: const Color(0xFF86A9FF),
 
     brightness: Brightness.light,
 
@@ -18,7 +18,7 @@ class AppTheme {
   );
 
   static final darkTheme = ThemeData(
-    colorSchemeSeed: const Color(0xFF0057CC),
+    colorSchemeSeed: const Color(0xFF86A9FF),
 
     brightness: Brightness.dark,
 

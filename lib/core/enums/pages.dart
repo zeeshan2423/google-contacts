@@ -1,4 +1,1 @@
-/// Enumeration representing different pages/screens in the application.
-enum PAGES {
-  contacts,
-}
+enum PAGES { contacts, createContact, favorites }

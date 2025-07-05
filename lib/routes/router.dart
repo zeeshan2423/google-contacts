@@ -13,13 +13,41 @@ class AppRouter {
     initialLocation: _initialLocation,
     observers: [MyRouteObserver()],
     routes: [
-      GoRoute(
-        path: PAGES.contacts.screenPath,
-        name: PAGES.contacts.screenName,
-        builder: (context, state) => BlocProvider(
-          create: (context) => sl<ContactsCubit>(),
-          child: const ContactsPage(),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) => BlocProvider.value(
+          value: sl<NavigationCubit>(),
+          child: NavigationPage(key: state.pageKey, child: navigationShell),
         ),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: PAGES.contacts.screenPath,
+                name: PAGES.contacts.screenName,
+                pageBuilder: (context, state) => buildPageWithDefaultTransition(
+                  child: BlocProvider.value(
+                    value: sl<ContactsCubit>(),
+                    child: const ContactsPage(),
+                  ),
+                ),
+                routes: [
+                  GoRoute(
+                    path: PAGES.createContact.screenPath,
+                    name: PAGES.createContact.screenName,
+                    parentNavigatorKey: _rootNavigator,
+                    pageBuilder: (context, state) =>
+                        buildPageWithDefaultTransition(
+                          child: BlocProvider.value(
+                            value: sl<CreateContactCubit>(),
+                            child: const CreateContactPage(),
+                          ),
+                        ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     ],
   );

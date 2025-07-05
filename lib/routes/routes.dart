@@ -4,7 +4,11 @@ extension AppPageExtension on PAGES {
   String get screenPath {
     switch (this) {
       case PAGES.contacts:
-        return '/contacts';
+        return '/';
+      case PAGES.createContact:
+        return 'create-contact';
+      case PAGES.favorites:
+        return '/favorites';
     }
   }
 
@@ -12,6 +16,10 @@ extension AppPageExtension on PAGES {
     switch (this) {
       case PAGES.contacts:
         return 'CONTACTS';
+      case PAGES.createContact:
+        return 'CREATE_CONTACT';
+      case PAGES.favorites:
+        return 'FAVORITES';
     }
   }
 
@@ -19,6 +27,10 @@ extension AppPageExtension on PAGES {
     switch (this) {
       case PAGES.contacts:
         return 'Contacts';
+      case PAGES.createContact:
+        return 'Create Contact';
+      case PAGES.favorites:
+        return 'Favorites';
     }
   }
 }

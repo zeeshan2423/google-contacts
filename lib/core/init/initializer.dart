@@ -6,6 +6,8 @@ class AppInitializer {
   static Future<void> initialize() async {
     WidgetsFlutterBinding.ensureInitialized();
 
+    await dotenv.load();
+
     await init();
 
     await Firebase.initializeApp(

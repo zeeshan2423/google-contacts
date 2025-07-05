@@ -7,6 +7,7 @@ export 'package:firebase_core/firebase_core.dart';
 export 'package:flutter/foundation.dart';
 export 'package:flutter/material.dart';
 export 'package:flutter_bloc/flutter_bloc.dart';
+export 'package:flutter_dotenv/flutter_dotenv.dart';
 export 'package:flutter_localizations/flutter_localizations.dart';
 export 'package:get_it/get_it.dart';
 export 'package:go_router/go_router.dart';

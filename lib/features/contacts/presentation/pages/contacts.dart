@@ -9,6 +9,7 @@ class ContactsPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Contacts'),
       ),
+      floatingActionButton: FloatingActionButton(onPressed: () {}),
     );
   }
 }

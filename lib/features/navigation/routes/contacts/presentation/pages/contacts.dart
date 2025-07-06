@@ -115,31 +115,50 @@ class ContactsPage extends StatelessWidget {
                                                     .join(' ');
 
                                             return ListTile(
+                                              onTap: () {
+                                                context.goNamed(
+                                                  PAGES
+                                                      .contactDetail
+                                                      .screenName,
+                                                  extra: {
+                                                    'contact': contact,
+                                                  },
+                                                );
+                                              },
                                               leading: CircleAvatar(
-                                                backgroundColor:
-                                                    _getAvatarColor(
-                                                      fullName,
-                                                      context,
-                                                    ),
-                                                child: FittedBox(
-                                                  child: Text(
-                                                    _getInitials(fullName),
-                                                    style: textTheme.titleMedium
-                                                        ?.copyWith(
-                                                          color: colorScheme
-                                                              .onPrimaryContainer,
-                                                        ),
-                                                  ),
+                                                backgroundColor: getAvatarColor(
+                                                  fullName,
+                                                  context,
                                                 ),
+                                                child: fullName.isEmpty
+                                                    ? Icon(
+                                                        Icons.person,
+                                                        color:
+                                                            colorScheme.surface,
+                                                      )
+                                                    : FittedBox(
+                                                        child: Text(
+                                                          getInitials(fullName),
+                                                          style: textTheme
+                                                              .titleMedium
+                                                              ?.copyWith(
+                                                                color:
+                                                                    colorScheme
+                                                                        .surface,
+                                                              ),
+                                                        ),
+                                                      ),
                                               ),
 
                                               title: Text(
                                                 fullName.isEmpty
-                                                    ? 'Unnamed Contact'
+                                                    ? contact.phoneNumber ?? ''
                                                     : fullName,
                                               ),
                                               subtitle:
-                                                  contact.phoneNumber != null
+                                                  fullName.isNotEmpty &&
+                                                      contact.phoneNumber !=
+                                                          null
                                                   ? Text(contact.phoneNumber!)
                                                   : null,
                                             );
@@ -306,37 +325,4 @@ class _SliverSearchBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   bool shouldRebuild(covariant _SliverSearchBarDelegate oldDelegate) => false;
-}
-
-String _getInitials(String name) {
-  final parts = name
-      .trim()
-      .split(RegExp(r'\s+'))
-      .where((part) => part.isNotEmpty)
-      .toList();
-
-  if (parts.isEmpty) return '?';
-
-  return parts.map((part) => part[0].toUpperCase()).join();
-}
-
-Color _getAvatarColor(String name, BuildContext context) {
-  final isDark = Theme.of(context).brightness == Brightness.dark;
-  final colors = isDark
-      ? [
-          const Color(0xFF4E5D6A),
-          const Color(0xFF5C6BC0),
-          const Color(0xFF00897B),
-          const Color(0xFF6D4C41),
-        ]
-      : [
-          const Color(0xFFFFCDD2),
-          const Color(0xFFC8E6C9),
-          const Color(0xFFBBDEFB),
-          const Color(0xFFB2EBF2),
-          const Color(0xFFD1C4E9),
-        ];
-
-  final index = name.hashCode % colors.length;
-  return colors[index];
 }

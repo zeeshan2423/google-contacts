@@ -3,8 +3,8 @@ import 'package:google_contacts/core/constants/imports.dart';
 class Contact extends Equatable {
   const Contact({
     required this.id,
-    required this.createdAt,
-    required this.updatedAt,
+    this.createdAt,
+    this.updatedAt,
     this.firstName,
     this.middleName,
     this.surname,
@@ -32,8 +32,8 @@ class Contact extends Equatable {
   final String? department;
   final String? notes;
   final bool isFavorite;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   Contact copyWith({
     String? id,

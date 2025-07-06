@@ -1,5 +1,7 @@
-abstract class ContactDetailRepository {
-  Future<void> deleteContact(String id);
+import 'package:google_contacts/core/constants/imports.dart';
 
-  Future<void> toggleFavorite(String id);
+abstract class ContactDetailRepository {
+  ResultVoid<void> deleteContact({required String id});
+
+  ResultVoid<void> toggleFavorite({required String id});
 }

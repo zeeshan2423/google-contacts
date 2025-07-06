@@ -1,7 +1,9 @@
 import 'package:google_contacts/core/constants/imports.dart';
 
 class CreateContactPage extends StatelessWidget {
-  const CreateContactPage({super.key});
+  const CreateContactPage({this.contact, super.key});
+
+  final Contact? contact;
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +65,9 @@ class CreateContactPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: BlocConsumer<CreateContactCubit, CreateContactState>(
               listenWhen: (previous, current) =>
-                  current is CreateContactInProgress,
+                  current is CreateContactInProgress ||
+                  current is CreateContactFailure ||
+                  current is CreateContactSuccess,
               buildWhen: (previous, current) =>
                   current is! CreateContactInProgress,
               listener: (context, state) {
@@ -73,7 +77,7 @@ class CreateContactPage extends StatelessWidget {
                     text: state.message,
                   );
                 }
-                if (state is CreateContactInProgress) {
+                if (state is CreateContactSuccess) {
                   final fullName =
                       [
                             cubit.firstNameController.text,
@@ -255,6 +259,7 @@ class CreateContactPage extends StatelessWidget {
                         type: FIELDS.phone,
                         controller: cubit.phoneController,
                         focusNode: cubit.phoneNode,
+                        selectedDialCode: cubit.selectedDialCode,
                       ),
                     ),
                     Padding(

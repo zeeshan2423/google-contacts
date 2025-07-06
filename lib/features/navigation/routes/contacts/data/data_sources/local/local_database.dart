@@ -133,6 +133,30 @@ class LocalDatabase {
     );
   }
 
+  Future<void> toggleFavorite(String id) async {
+    final db = await database;
+
+    final List<Map<String, dynamic>> result = await db.query(
+      _tableName,
+      columns: ['isFavorite'],
+      where: 'id = ?',
+      whereArgs: [id],
+      limit: 1,
+    );
+
+    if (result.isNotEmpty) {
+      final currentValue = result.first['isFavorite'] as int;
+      final newValue = currentValue == 1 ? 0 : 1;
+
+      await db.update(
+        _tableName,
+        {'isFavorite': newValue, 'updatedAt': DateTime.now().toIso8601String()},
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    }
+  }
+
   Future<List<ContactModel>> searchContacts(String query) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(

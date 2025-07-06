@@ -7,6 +7,8 @@ extension AppPageExtension on PAGES {
         return '/';
       case PAGES.createContact:
         return 'create-contact';
+      case PAGES.contactDetail:
+        return 'contact-detail';
       case PAGES.favorites:
         return '/favorites';
     }
@@ -18,6 +20,8 @@ extension AppPageExtension on PAGES {
         return 'CONTACTS';
       case PAGES.createContact:
         return 'CREATE_CONTACT';
+      case PAGES.contactDetail:
+        return 'CONTACT_DETAIL';
       case PAGES.favorites:
         return 'FAVORITES';
     }
@@ -29,6 +33,8 @@ extension AppPageExtension on PAGES {
         return 'Contacts';
       case PAGES.createContact:
         return 'Create Contact';
+      case PAGES.contactDetail:
+        return 'Contact Detail';
       case PAGES.favorites:
         return 'Favorites';
     }

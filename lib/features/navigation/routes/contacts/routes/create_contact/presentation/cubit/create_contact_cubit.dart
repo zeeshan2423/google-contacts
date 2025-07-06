@@ -44,6 +44,8 @@ class CreateContactCubit extends Cubit<CreateContactState> {
   final isAddTitleVisible = ValueNotifier<bool>(true);
   final isSaving = ValueNotifier<bool>(false);
 
+  final selectedDialCode = '+91';
+
   Future<void> addNewContact() async {
     emit(const CreateContactInProgress());
     try {
@@ -54,7 +56,7 @@ class CreateContactCubit extends Cubit<CreateContactState> {
         firstName: firstNameController.text,
         middleName: middleNameController.text,
         surname: lastNameController.text,
-        phoneNumber: phoneController.text,
+        phoneNumber: '$selectedDialCode ${phoneController.text}',
         email: emailController.text,
         birthday: birthdayController.text,
         address: addressController.text,

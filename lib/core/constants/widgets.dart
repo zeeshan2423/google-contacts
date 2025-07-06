@@ -60,6 +60,7 @@ class AppWidgets {
     required FIELDS type,
     required TextEditingController controller,
     FocusNode? focusNode,
+    String? selectedDialCode,
   }) {
     final textTheme = context.theme.textTheme;
     final colorScheme = context.theme.colorScheme;
@@ -188,7 +189,9 @@ class AppWidgets {
                     ],
                   ),
                 ),
-                onChanged: print,
+                onChanged: (e) {
+                  selectedDialCode = e.dialCode;
+                },
                 initialSelection: 'IN',
                 favorite: const ['+91'],
                 flagWidth: 16,

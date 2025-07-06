@@ -18,5 +18,13 @@ Future<void> init() async {
     ..registerLazySingleton(() => UpdateContact(sl()))
     ..registerLazySingleton<CreateContactRepository>(
       () => CreateContactRepositoryImpl(sl()),
+    )
+    ..registerFactory(
+      () => ContactDetailCubit(toggleFavorite: sl(), deleteContact: sl()),
+    )
+    ..registerLazySingleton(() => ToggleFavorite(sl()))
+    ..registerLazySingleton(() => DeleteContact(sl()))
+    ..registerLazySingleton<ContactDetailRepository>(
+      () => ContactDetailRepositoryImpl(sl()),
     );
 }

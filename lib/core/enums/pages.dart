@@ -1,1 +1,1 @@
-enum PAGES { contacts, createContact, favorites }
+enum PAGES { contacts, createContact, contactDetail, favorites }

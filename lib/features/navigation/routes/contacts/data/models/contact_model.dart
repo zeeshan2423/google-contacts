@@ -1,7 +1,4 @@
-import 'dart:convert';
-
-import 'package:google_contacts/core/utils/typedef.dart';
-import 'package:google_contacts/features/navigation/routes/contacts/domain/entities/contact.dart';
+import 'package:google_contacts/core/constants/imports.dart';
 
 class ContactModel extends Contact {
   const ContactModel({
@@ -45,7 +42,7 @@ class ContactModel extends Contact {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
+      'id': this.id,
       'firstName': firstName,
       'middleName': middleName,
       'surname': surname,
@@ -58,8 +55,8 @@ class ContactModel extends Contact {
       'department': department,
       'notes': notes,
       'isFavorite': isFavorite ? 1 : 0,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
     };
   }
 

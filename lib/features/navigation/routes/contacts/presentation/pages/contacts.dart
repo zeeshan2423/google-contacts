@@ -8,6 +8,34 @@ class ContactsPage extends StatelessWidget {
     final colorScheme = context.theme.colorScheme;
     final textTheme = context.theme.textTheme;
 
+    Map<String, List<Contact>> groupContacts(List<Contact> contacts) {
+      final grouped = <String, List<Contact>>{};
+
+      for (final contact in contacts) {
+        final name =
+            '''${contact.firstName ?? ''}${contact.middleName ?? ''}${contact.surname ?? ''}'''
+                .trim();
+        final firstChar = name.isEmpty
+            ? '#'
+            : RegExp('^[A-Za-z]').hasMatch(name[0])
+            ? name[0].toUpperCase()
+            : '#';
+
+        grouped.putIfAbsent(firstChar, () => []).add(contact);
+      }
+
+      final sortedKeys = grouped.keys.toList()
+        ..sort((a, b) {
+          if (a == '#') return -1;
+          if (b == '#') return 1;
+          return a.compareTo(b);
+        });
+
+      return {
+        for (final key in sortedKeys) key: grouped[key]!,
+      };
+    }
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -19,68 +47,117 @@ class ContactsPage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              GestureDetector(
-                onTap: () async {
-                  await showSearch(
-                    context: context,
-                    delegate: ContactsSearchDelegate(),
-                  );
+              BlocConsumer<ContactsCubit, ContactsState>(
+                listenWhen: (previous, current) =>
+                    current is ContactsInProgress,
+                buildWhen: (previous, current) =>
+                    current is! ContactsInProgress,
+                listener: (context, state) {
+                  if (state is ContactsFailure) {
+                    AppWidgets.customSnackBar(
+                      context: context,
+                      text: state.message,
+                    );
+                  }
                 },
-                child: Container(
-                  height: 48,
-                  padding: const EdgeInsets.only(left: 19, right: 12),
-                  decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHigh,
-                    borderRadius: BorderRadius.circular(48),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.search,
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Search contacts',
-                          style: textTheme.titleMedium?.copyWith(
-                            color: colorScheme.onSurfaceVariant,
-                          ),
+                builder: (context, state) {
+                  switch (state.runtimeType) {
+                    case ContactsInProgress:
+                      return const Expanded(
+                        child: Center(
+                          child: CircularProgressIndicator(),
                         ),
-                      ),
-                      Icon(
-                        Icons.account_circle_outlined,
-                        color: colorScheme.primary,
-                        size: 30,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  spacing: 36,
-                  children: [
-                    Lottie.asset(
-                      AppTheme.isDarkMode.value
-                          ? AppAssets.vaseNight
-                          : AppAssets.vase,
-                      repeat: false,
-                      frameRate: const FrameRate(60),
-                      animate: true,
-                      height: 156,
-                    ),
-                    Text(
-                      'No contacts yet',
-                      style: textTheme.titleLarge?.copyWith(
-                        color: colorScheme.onSurface,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
+                      );
+                    case ContactsSuccess:
+                      final contacts = (state! as ContactsSuccess).contacts;
+                      if (contacts.isEmpty) {
+                        return _buildNoContacts(textTheme, colorScheme);
+                      } else {
+                        return Expanded(
+                          child: CustomScrollView(
+                            slivers: [
+                              SliverPersistentHeader(
+                                pinned: true,
+                                delegate: _SliverSearchBarDelegate(
+                                  colorScheme,
+                                  textTheme,
+                                ),
+                              ),
+                              ...groupContacts(contacts).entries
+                                  .map(
+                                    (entry) => [
+                                      SliverPersistentHeader(
+                                        delegate: _SliverHeaderDelegate(
+                                          entry.key,
+                                          colorScheme,
+                                          textTheme,
+                                        ),
+                                      ),
+                                      SliverList(
+                                        delegate: SliverChildBuilderDelegate(
+                                          (context, index) {
+                                            final contact = entry.value[index];
+                                            final fullName =
+                                                [
+                                                      contact.firstName,
+                                                      contact.middleName,
+                                                      contact.surname,
+                                                    ]
+                                                    .where(
+                                                      (part) =>
+                                                          part != null &&
+                                                          part
+                                                              .trim()
+                                                              .isNotEmpty,
+                                                    )
+                                                    .join(' ');
+
+                                            return ListTile(
+                                              leading: CircleAvatar(
+                                                backgroundColor:
+                                                    _getAvatarColor(
+                                                      fullName,
+                                                      context,
+                                                    ),
+                                                child: FittedBox(
+                                                  child: Text(
+                                                    _getInitials(fullName),
+                                                    style: textTheme.titleMedium
+                                                        ?.copyWith(
+                                                          color: colorScheme
+                                                              .onPrimaryContainer,
+                                                        ),
+                                                  ),
+                                                ),
+                                              ),
+
+                                              title: Text(
+                                                fullName.isEmpty
+                                                    ? 'Unnamed Contact'
+                                                    : fullName,
+                                              ),
+                                              subtitle:
+                                                  contact.phoneNumber != null
+                                                  ? Text(contact.phoneNumber!)
+                                                  : null,
+                                            );
+                                          },
+                                          childCount: entry.value.length,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                  .expand((e) => e),
+                            ],
+                          ),
+                        );
+                      }
+                    default:
+                      return _buildNoContacts(textTheme, colorScheme);
+                  }
+                },
               ),
             ],
           ),
@@ -88,4 +165,178 @@ class ContactsPage extends StatelessWidget {
       ),
     );
   }
+
+  Expanded _buildNoContacts(TextTheme textTheme, ColorScheme colorScheme) {
+    return Expanded(
+      child: CustomScrollView(
+        slivers: [
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: _SliverSearchBarDelegate(
+              colorScheme,
+              textTheme,
+            ),
+          ),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Lottie.asset(
+                  AppTheme.isDarkMode.value
+                      ? AppAssets.vaseNight
+                      : AppAssets.vase,
+                  repeat: false,
+                  frameRate: const FrameRate(60),
+                  animate: true,
+                  height: 156,
+                ),
+                const SizedBox(height: 36),
+                Text(
+                  'No contacts yet',
+                  style: textTheme.titleLarge?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
+  _SliverHeaderDelegate(this.label, this.colorScheme, this.textTheme);
+
+  final String label;
+  final ColorScheme colorScheme;
+  final TextTheme textTheme;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(
+      alignment: Alignment.centerLeft,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      height: 40,
+      child: Text(
+        label,
+        style: textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.w600,
+          color: colorScheme.primary,
+        ),
+      ),
+    );
+  }
+
+  @override
+  double get maxExtent => 40;
+
+  @override
+  double get minExtent => 0;
+
+  @override
+  bool shouldRebuild(covariant _SliverHeaderDelegate oldDelegate) => false;
+}
+
+class _SliverSearchBarDelegate extends SliverPersistentHeaderDelegate {
+  _SliverSearchBarDelegate(this.colorScheme, this.textTheme);
+
+  final ColorScheme colorScheme;
+  final TextTheme textTheme;
+
+  @override
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(
+      color: colorScheme.background,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: GestureDetector(
+        onTap: () async {
+          await showSearch(
+            context: context,
+            delegate: ContactsSearchDelegate(),
+          );
+        },
+        child: Container(
+          height: 48,
+          padding: const EdgeInsets.only(left: 19, right: 12),
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceContainerHigh,
+            borderRadius: BorderRadius.circular(48),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.search, color: colorScheme.onSurfaceVariant),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Search contacts',
+                  style: textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.account_circle_outlined,
+                color: colorScheme.primary,
+                size: 30,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  double get maxExtent => 64;
+
+  @override
+  double get minExtent => 64;
+
+  @override
+  bool shouldRebuild(covariant _SliverSearchBarDelegate oldDelegate) => false;
+}
+
+String _getInitials(String name) {
+  final parts = name
+      .trim()
+      .split(RegExp(r'\s+'))
+      .where((part) => part.isNotEmpty)
+      .toList();
+
+  if (parts.isEmpty) return '?';
+
+  return parts.map((part) => part[0].toUpperCase()).join();
+}
+
+Color _getAvatarColor(String name, BuildContext context) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  final colors = isDark
+      ? [
+          const Color(0xFF4E5D6A),
+          const Color(0xFF5C6BC0),
+          const Color(0xFF00897B),
+          const Color(0xFF6D4C41),
+        ]
+      : [
+          const Color(0xFFFFCDD2),
+          const Color(0xFFC8E6C9),
+          const Color(0xFFBBDEFB),
+          const Color(0xFFB2EBF2),
+          const Color(0xFFD1C4E9),
+        ];
+
+  final index = name.hashCode % colors.length;
+  return colors[index];
 }

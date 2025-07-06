@@ -3,7 +3,17 @@ import 'package:google_contacts/core/constants/imports.dart';
 part 'create_contact_state.dart';
 
 class CreateContactCubit extends Cubit<CreateContactState> {
-  CreateContactCubit() : super(CreateContactInitial());
+  CreateContactCubit({
+    required AddContact addContact,
+    required UpdateContact updateContact,
+  }) : _addContact = addContact,
+       _updateContact = updateContact,
+       super(const CreateContactInitial()) {
+    phoneNode.requestFocus();
+  }
+
+  final AddContact _addContact;
+  final UpdateContact _updateContact;
 
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
@@ -32,6 +42,42 @@ class CreateContactCubit extends Cubit<CreateContactState> {
   final isJobTitleVisible = ValueNotifier<bool>(false);
   final isDepartmentVisible = ValueNotifier<bool>(false);
   final isAddTitleVisible = ValueNotifier<bool>(true);
+  final isSaving = ValueNotifier<bool>(false);
+
+  Future<void> addNewContact() async {
+    emit(const CreateContactInProgress());
+    try {
+      isSaving.value = true;
+      final now = DateTime.now();
+      final contact = ContactModel(
+        id: const Uuid().v4(),
+        firstName: firstNameController.text,
+        middleName: middleNameController.text,
+        surname: lastNameController.text,
+        phoneNumber: phoneController.text,
+        email: emailController.text,
+        birthday: birthdayController.text,
+        address: addressController.text,
+        company: companyController.text,
+        title: jobTitleController.text,
+        department: departmentController.text,
+        notes: notesController.text,
+        createdAt: now,
+        updatedAt: now,
+      );
+      final contactsResult = await _addContact(
+        AddContactParams(contact: contact),
+      );
+      contactsResult.fold(
+        (failure) => emit(CreateContactFailure(failure.message)),
+        (contact) => emit(const CreateContactSuccess()),
+      );
+    } on Exception catch (e) {
+      emit(CreateContactFailure(e.toString()));
+    } finally {
+      isSaving.value = false;
+    }
+  }
 
   @override
   Future<void> close() {

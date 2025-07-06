@@ -41,7 +41,6 @@ class MyApp extends StatelessWidget {
                   AppWidgets.customSnackBar(
                     context: context,
                     text: AppStrings.noInternetMsg,
-                    duration: const Duration(days: 1),
                   );
                 } else {
                   AppWidgets.customSnackBar(

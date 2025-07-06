@@ -1,6 +1,4 @@
-import 'package:country_code_picker/country_code_picker.dart';
 import 'package:google_contacts/core/constants/imports.dart';
-import 'package:google_contacts/core/utils/value_listenable_builder.dart';
 
 class AppWidgets {
   AppWidgets._();
@@ -9,16 +7,50 @@ class AppWidgets {
   customSnackBar({
     required BuildContext context,
     required String text,
-    Duration duration = const Duration(seconds: 4),
   }) {
+    final colorScheme = context.theme.colorScheme;
+    final textTheme = context.theme.textTheme;
     ScaffoldMessenger.of(context).removeCurrentSnackBar();
     return ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
         behavior: SnackBarBehavior.floating,
-        content: Text(text),
-        showCloseIcon: true,
-        actionOverflowThreshold: 1,
-        duration: duration,
+        duration: const Duration(seconds: 3),
+        content: Align(
+          alignment: Alignment.bottomCenter,
+          child: IntrinsicWidth(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainer,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: colorScheme.outlineVariant,
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: 12,
+                children: [
+                  SvgPicture.asset(AppAssets.logo, width: 24),
+                  Flexible(
+                    child: Text(
+                      text,
+                      style: textTheme.labelMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -80,9 +112,7 @@ class AppWidgets {
         keyboardType = TextInputType.text;
       case FIELDS.phone:
         labelText = 'Phone (Mobile)';
-        inputFormatters = [
-          FilteringTextInputFormatter.digitsOnly,
-        ];
+        inputFormatters = [FilteringTextInputFormatter.digitsOnly];
         keyboardType = TextInputType.phone;
       case FIELDS.email:
         labelText = 'Email';
@@ -131,23 +161,32 @@ class AppWidgets {
         ),
         alignLabelWithHint: true,
         suffixIcon: type == FIELDS.birthday ? const Icon(Icons.event) : null,
-        prefixIcon: type == FIELDS.phone
+        prefix: type == FIELDS.phone
             ? CountryCodePicker(
-                builder: (e) => Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 12, right: 4),
-                      child: e!.flagUri != null
-                          ? Image.asset(
-                              e.flagUri!,
-                              package: 'country_code_picker',
-                              width: 20,
-                            )
-                          : const SizedBox(),
-                    ),
-                    const Icon(Icons.arrow_drop_down),
-                  ],
+                builder: (e) => Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: 8,
+                    children: [
+                      if (e!.flagUri != null)
+                        Image.asset(
+                          e.flagUri!,
+                          package: 'country_code_picker',
+                          width: 20,
+                        ),
+                      SvgPicture.asset(
+                        AppAssets.arrowDropDown,
+                        height: 4,
+                      ),
+                      Text(
+                        e.dialCode ?? '',
+                        style: textTheme.bodyLarge?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 onChanged: print,
                 initialSelection: 'IN',

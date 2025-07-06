@@ -16,6 +16,6 @@ class AppInitializer {
 
     Bloc.observer = AppBlocObserver();
 
-    await DatabaseService.database;
+    await LocalDatabase.database;
   }
 }

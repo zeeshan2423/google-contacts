@@ -78,6 +78,26 @@ A modern Flutter application inspired by Google Contacts. This app enables users
    flutter run
    ```
 
+## Screenshots
+
+<p align="center">
+  <img src="assets/screenshots/no_contact.png" alt="No contact" width="30%" />
+  <img src="assets/screenshots/no_favorite.png" alt="No favorite" width="30%" />
+  <img src="assets/screenshots/add_contact_default.png" alt="Add contact default" width="30%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshots/add_contact_extra.png" alt="Add contact extra" width="30%" />
+  <img src="assets/screenshots/contact_detail.png" alt="Contact detail" width="30%" />
+  <img src="assets/screenshots/contact_list.png" alt="Contact List" width="30%" />
+</p>
+
+<p align="center">
+  <img src="assets/screenshots/edit_contact.png" alt="Edit contact" width="30%" />
+  <img src="assets/screenshots/favorite_list.png" alt="Favorite list" width="30%" />
+  <img src="assets/screenshots/search_contact.png" alt="Search contact" width="30%" />
+</p>
+
 ## Usage
 
 - Add Contact: Tap the "+" icon, fill in the form, and save

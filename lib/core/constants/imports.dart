@@ -12,10 +12,9 @@ export 'package:flutter/services.dart';
 export 'package:flutter_bloc/flutter_bloc.dart';
 export 'package:flutter_dotenv/flutter_dotenv.dart';
 export 'package:flutter_localizations/flutter_localizations.dart';
+export 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 export 'package:flutter_svg/flutter_svg.dart';
 export 'package:get_it/get_it.dart';
-export 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
-
 export 'package:go_router/go_router.dart';
 export 'package:google_contacts/core/constants/assets.dart';
 export 'package:google_contacts/core/constants/strings.dart';
@@ -27,6 +26,7 @@ export 'package:google_contacts/core/errors/exception.dart';
 export 'package:google_contacts/core/errors/failure.dart';
 export 'package:google_contacts/core/extensions/context_extension.dart';
 export 'package:google_contacts/core/helpers/first_letter_uppercase.dart';
+export 'package:google_contacts/core/helpers/highlight_query.dart';
 export 'package:google_contacts/core/helpers/search_delegate.dart';
 export 'package:google_contacts/core/helpers/transitions.dart';
 export 'package:google_contacts/core/init/initializer.dart';
@@ -46,6 +46,7 @@ export 'package:google_contacts/features/navigation/routes/contacts/data/reposit
 export 'package:google_contacts/features/navigation/routes/contacts/domain/entities/contact.dart';
 export 'package:google_contacts/features/navigation/routes/contacts/domain/repositories/contacts_repository.dart';
 export 'package:google_contacts/features/navigation/routes/contacts/domain/use_cases/get_contacts.dart';
+export 'package:google_contacts/features/navigation/routes/contacts/domain/use_cases/search_contacts.dart';
 export 'package:google_contacts/features/navigation/routes/contacts/presentation/cubit/contacts_cubit.dart';
 export 'package:google_contacts/features/navigation/routes/contacts/presentation/pages/contacts.dart';
 export 'package:google_contacts/features/navigation/routes/contacts/routes/contact_detail/data/repositories/contact_detail_repository_impl.dart';
@@ -60,6 +61,8 @@ export 'package:google_contacts/features/navigation/routes/contacts/routes/creat
 export 'package:google_contacts/features/navigation/routes/contacts/routes/create_contact/domain/use_cases/update_contact.dart';
 export 'package:google_contacts/features/navigation/routes/contacts/routes/create_contact/presentation/cubit/create_contact_cubit.dart';
 export 'package:google_contacts/features/navigation/routes/contacts/routes/create_contact/presentation/pages/create_contact.dart';
+export 'package:google_contacts/features/navigation/routes/favorites/presentation/cubit/favorites_cubit.dart';
+export 'package:google_contacts/features/navigation/routes/favorites/presentation/pages/favorites.dart';
 export 'package:google_contacts/features/network/presentation/cubit/network_cubit.dart';
 export 'package:google_contacts/firebase_options.dart';
 export 'package:google_contacts/my_app.dart';

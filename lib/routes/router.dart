@@ -24,12 +24,18 @@ class AppRouter {
               GoRoute(
                 path: PAGES.contacts.screenPath,
                 name: PAGES.contacts.screenName,
-                pageBuilder: (context, state) => buildPageWithDefaultTransition(
-                  child: BlocProvider.value(
-                    value: sl<ContactsCubit>(),
-                    child: const ContactsPage(),
-                  ),
-                ),
+                pageBuilder: (context, state) {
+                  return buildPageWithDefaultTransition(
+                    child: MultiBlocProvider(
+                      providers: [
+                        BlocProvider.value(value: sl<ContactsCubit>()),
+                        BlocProvider.value(value: sl<FavoritesCubit>()),
+                        BlocProvider.value(value: sl<NavigationCubit>()),
+                      ],
+                      child: const ContactsPage(),
+                    ),
+                  );
+                },
                 routes: [
                   GoRoute(
                     path: PAGES.createContact.screenPath,
@@ -56,8 +62,13 @@ class AppRouter {
                     parentNavigatorKey: _rootNavigator,
                     pageBuilder: (context, state) =>
                         buildPageWithDefaultTransition(
-                          child: BlocProvider.value(
-                            value: sl<ContactDetailCubit>(),
+                          child: MultiBlocProvider(
+                            providers: [
+                              BlocProvider.value(value: sl<ContactsCubit>()),
+                              BlocProvider.value(
+                                value: sl<ContactDetailCubit>(),
+                              ),
+                            ],
                             child: ContactDetailPage(
                               key: state.pageKey,
                               contact:
@@ -69,6 +80,20 @@ class AppRouter {
                         ),
                   ),
                 ],
+              ),
+              GoRoute(
+                path: PAGES.favorites.screenPath,
+                name: PAGES.favorites.screenName,
+                pageBuilder: (context, state) => buildPageWithDefaultTransition(
+                  child: MultiBlocProvider(
+                    providers: [
+                      BlocProvider.value(value: sl<FavoritesCubit>()),
+                      BlocProvider.value(value: sl<ContactsCubit>()),
+                      BlocProvider.value(value: sl<NavigationCubit>()),
+                    ],
+                    child: const FavoritesPage(),
+                  ),
+                ),
               ),
             ],
           ),

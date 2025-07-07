@@ -14,4 +14,14 @@ class ContactsRepositoryImpl implements ContactsRepository {
       return Left(ApiFailure.fromException(e));
     }
   }
+
+  @override
+  ResultFuture<List<Contact>> searchContacts({required String query}) async {
+    try {
+      final result = await _localDataSource.searchContacts(query);
+      return Right(result);
+    } on ServerException catch (e) {
+      return Left(ApiFailure.fromException(e));
+    }
+  }
 }

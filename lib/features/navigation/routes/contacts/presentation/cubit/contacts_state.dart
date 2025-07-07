@@ -24,6 +24,19 @@ final class ContactsSuccess extends ContactsState {
   List<Contact> get props => contacts;
 }
 
+final class ContactsSearchInProgress extends ContactsState {
+  const ContactsSearchInProgress();
+}
+
+final class ContactsSearchSuccess extends ContactsState {
+  const ContactsSearchSuccess(this.contacts);
+
+  final List<Contact> contacts;
+
+  @override
+  List<Contact> get props => contacts;
+}
+
 final class ContactsFailure extends ContactsState {
   const ContactsFailure(this.message);
 

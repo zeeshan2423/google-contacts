@@ -7,6 +7,8 @@ extension ContextExtension on BuildContext {
 
   NavigationCubit get navigationCubit => read<NavigationCubit>();
 
+  ContactsCubit get contactsCubit => read<ContactsCubit>();
+
   CreateContactCubit get createContactCubit => read<CreateContactCubit>();
 
   ContactDetailCubit get contactDetailCubit => read<ContactDetailCubit>();

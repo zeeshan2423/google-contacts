@@ -8,6 +8,7 @@ class ContactDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cubit = context.contactDetailCubit;
+    final contactsCubit = context.contactsCubit;
     final colorScheme = context.theme.colorScheme;
     final textTheme = context.theme.textTheme;
     cubit.isFavorite.value = contact.isFavorite;
@@ -21,7 +22,7 @@ class ContactDetailPage extends StatelessWidget {
               current is ContactDetailFailure ||
               current is ContactDetailSuccess,
           buildWhen: (previous, current) => current is! ContactDetailInProgress,
-          listener: (context, state) {
+          listener: (context, state) async {
             if (state is ContactDetailFailure) {
               AppWidgets.customSnackBar(
                 context: context,
@@ -40,7 +41,8 @@ class ContactDetailPage extends StatelessWidget {
                 context: context,
                 text: '1 Contact deleted',
               );
-              context.goNamed(PAGES.contacts.screenName);
+              await contactsCubit.loadContacts();
+              if (context.mounted) context.pop();
             }
           },
           builder: (context, state) => CustomScrollView(
@@ -52,8 +54,9 @@ class ContactDetailPage extends StatelessWidget {
                 backgroundColor: colorScheme.surface,
                 surfaceTintColor: colorScheme.surface,
                 leading: IconButton(
-                  onPressed: () {
-                    context.goNamed(PAGES.contacts.screenName);
+                  onPressed: () async {
+                    await contactsCubit.loadContacts();
+                    if (context.mounted) context.pop();
                   },
                   icon: const Icon(Icons.arrow_back),
                 ),
@@ -277,7 +280,7 @@ class ContactDetailPage extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Card.filled(
-                        color: colorScheme.surfaceContainer,
+                        color: colorScheme.surfaceBright,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           child: Column(

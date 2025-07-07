@@ -1,8 +1,14 @@
 import 'package:google_contacts/core/constants/imports.dart';
 
 class ContactsSearchDelegate extends SearchDelegate<String> {
-  @override
-  String get searchFieldLabel => 'Search contacts';
+  ContactsSearchDelegate({
+    required this.cubit,
+    required this.navigationCubit,
+    super.searchFieldLabel = 'Search contacts',
+  });
+
+  final ContactsCubit cubit;
+  final NavigationCubit navigationCubit;
 
   @override
   ThemeData appBarTheme(BuildContext context) {
@@ -17,12 +23,16 @@ class ContactsSearchDelegate extends SearchDelegate<String> {
         fillColor: theme.colorScheme.surfaceContainerHigh,
         border: InputBorder.none,
       ),
-      textTheme: theme.textTheme.copyWith(
-        titleMedium: theme.textTheme.titleMedium,
-      ),
       appBarTheme: AppBarTheme(
         backgroundColor: theme.colorScheme.surfaceContainerHigh,
         titleSpacing: 0,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        shape: Border(
+          bottom: BorderSide(
+            color: theme.colorScheme.outlineVariant,
+          ),
+        ),
       ),
     );
   }
@@ -36,16 +46,6 @@ class ContactsSearchDelegate extends SearchDelegate<String> {
           icon: Icon(Icons.clear, color: colorScheme.onSurfaceVariant),
           onPressed: () => query = '',
         ),
-      Padding(
-        padding: const EdgeInsets.only(right: 4),
-        child: IconButton(
-          icon: Icon(
-            Icons.mic_none_outlined,
-            color: colorScheme.onSurfaceVariant,
-          ),
-          onPressed: () {},
-        ),
-      ),
     ];
   }
 
@@ -54,30 +54,125 @@ class ContactsSearchDelegate extends SearchDelegate<String> {
     final colorScheme = Theme.of(context).colorScheme;
     return IconButton(
       icon: Icon(Icons.arrow_back, color: colorScheme.onSurfaceVariant),
-      onPressed: () => close(context, ''),
+      onPressed: () {
+        query = '';
+        cubit.loadContacts();
+        close(context, '');
+      },
     );
   }
 
   @override
   Widget buildResults(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHigh,
-      ),
-    );
+    return buildSuggestions(context);
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return Container(
-      decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHigh,
-        border: Border(
-          top: BorderSide(color: colorScheme.outline),
-        ),
-      ),
+    final colorScheme = context.theme.colorScheme;
+    final textTheme = context.theme.textTheme;
+    final highlightStyle = textTheme.bodyLarge?.copyWith(
+      color: colorScheme.primary,
+      fontWeight: FontWeight.bold,
+    );
+    final normalStyle = textTheme.bodyLarge;
+
+    cubit.searchForContacts(query);
+
+    return BlocBuilder<ContactsCubit, ContactsState>(
+      bloc: cubit,
+      builder: (context, state) {
+        if (state is ContactsSearchInProgress || state is ContactsInProgress) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (state is ContactsSearchSuccess) {
+          if (state.contacts.isEmpty) {
+            return const Center(child: Text('No contacts found.'));
+          }
+
+          return ColoredBox(
+            color: colorScheme.surfaceContainerHigh,
+            child: ListView.builder(
+              itemCount: state.contacts.length,
+              itemBuilder: (context, index) {
+                final contact = state.contacts[index];
+                final fullName =
+                    [
+                          contact.firstName,
+                          contact.middleName,
+                          contact.surname,
+                        ]
+                        .where(
+                          (part) => part != null && part.trim().isNotEmpty,
+                        )
+                        .join(' ');
+
+                return ListTile(
+                  title: RichText(
+                    text: highlightQuery(
+                      fullName.isNotEmpty
+                          ? fullName
+                          : (contact.phoneNumber ?? ''),
+                      query,
+                      normalStyle!,
+                      highlightStyle!,
+                    ),
+                  ),
+                  subtitle:
+                      fullName.isNotEmpty &&
+                          (contact.phoneNumber?.isNotEmpty ?? false)
+                      ? RichText(
+                          text: highlightQuery(
+                            contact.phoneNumber!,
+                            query,
+                            textTheme.bodyMedium!,
+                            highlightStyle,
+                          ),
+                        )
+                      : null,
+                  leading: CircleAvatar(
+                    backgroundColor: getAvatarColor(
+                      fullName,
+                      context,
+                    ),
+                    child: fullName.isEmpty
+                        ? Icon(
+                            Icons.person,
+                            color: colorScheme.surface,
+                          )
+                        : FittedBox(
+                            child: Text(
+                              getInitials(fullName),
+                              style: textTheme.titleMedium?.copyWith(
+                                color: colorScheme.surface,
+                              ),
+                            ),
+                          ),
+                  ),
+                  onTap: () {
+                    query = '';
+                    cubit.loadContacts();
+                    close(context, '');
+                    context.pushNamed(
+                      PAGES.contactDetail.screenName,
+                      extra: {'contact': contact},
+                    );
+                  },
+                );
+              },
+            ),
+          );
+        }
+
+        if (state is ContactsFailure) {
+          return Center(child: Text(state.message));
+        }
+
+        return Container(
+          color: colorScheme.surfaceContainerHigh,
+        );
+      },
     );
   }
 }

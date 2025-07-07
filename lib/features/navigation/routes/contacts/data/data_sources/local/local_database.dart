@@ -47,68 +47,6 @@ class LocalDatabase {
     return List.generate(maps.length, (i) => ContactModel.fromMap(maps[i]));
   }
 
-  Future<void> insertDummyContacts() async {
-    final db = LocalDatabase();
-    final now = DateTime.now();
-
-    final sampleFirstNames = [
-      'Alice',
-      'Bob',
-      'Charlie',
-      'David',
-      'Eva',
-      'Frank',
-      'Grace',
-      'Hank',
-      'Ivy',
-      'Jack',
-    ];
-    final sampleSurnames = [
-      'Smith',
-      'Johnson',
-      'Williams',
-      'Brown',
-      'Jones',
-      'Miller',
-      'Davis',
-      'Garcia',
-      'Taylor',
-      'Lee',
-    ];
-    final sampleCompanies = ['TechCorp', 'DesignX', 'FinServe', 'HealthHub'];
-    final sampleTitles = ['Manager', 'Developer', 'Analyst', 'Designer'];
-    final sampleDepartments = ['IT', 'HR', 'Finance', 'Marketing'];
-
-    for (var i = 0; i < 20; i++) {
-      final firstName = sampleFirstNames[i % sampleFirstNames.length];
-      final surname = sampleSurnames[i % sampleSurnames.length];
-      final phone = '+12345678${100 + i}';
-      final email = '${firstName.toLowerCase()}.$i@example.com';
-      final birthday = '199${i % 10}-0${(i % 9) + 1}-1${(i % 9) + 1}';
-
-      final contact = ContactModel(
-        id: const Uuid().v4(),
-        firstName: firstName,
-        surname: surname,
-        phoneNumber: phone,
-        email: email,
-        birthday: birthday,
-        address: '123 Sample Street, City',
-        company: sampleCompanies[i % sampleCompanies.length],
-        title: sampleTitles[i % sampleTitles.length],
-        department: sampleDepartments[i % sampleDepartments.length],
-        notes: 'Test contact #$i',
-        isFavorite: i % 4 == 0,
-        createdAt: now,
-        updatedAt: now,
-      );
-
-      await db.insertContact(contact);
-    }
-
-    debugPrint('✅ 20 dummy contacts inserted.');
-  }
-
   Future<void> insertContact(ContactModel contact) async {
     final db = await database;
     await db.insert(_tableName, contact.toMap());
@@ -161,8 +99,14 @@ class LocalDatabase {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       _tableName,
-      where: 'name LIKE ? OR phoneNumber LIKE ? OR email LIKE ?',
-      whereArgs: ['%$query%', '%$query%', '%$query%'],
+      where: '''
+  LOWER(firstName) LIKE LOWER(?) OR 
+  LOWER(middleName) LIKE LOWER(?) OR 
+  LOWER(surname) LIKE LOWER(?) OR 
+  LOWER(phoneNumber) LIKE LOWER(?) OR 
+  LOWER(email) LIKE LOWER(?)
+''',
+      whereArgs: List.filled(5, '%$query%'),
     );
     return List.generate(maps.length, (i) => ContactModel.fromMap(maps[i]));
   }

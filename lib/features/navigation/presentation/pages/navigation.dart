@@ -12,30 +12,42 @@ class NavigationPage extends StatelessWidget {
 
     return Scaffold(
       bottomNavigationBar: ValueListenableBuilder(
-        valueListenable: cubit.selectedIndex,
-        builder: (context, value, child) => NavigationBarTheme(
-          data: NavigationBarThemeData(
-            labelTextStyle: WidgetStatePropertyAll(textTheme.labelLarge),
-          ),
-          child: NavigationBar(
-            selectedIndex: value,
-            onDestinationSelected: (value) {
-              cubit.onDestinationSelected(value: value, context: context);
-            },
-            destinations: const [
-              NavigationDestination(
-                selectedIcon: Icon(Icons.person),
-                icon: Icon(Icons.person_outlined),
-                label: 'Contacts',
-              ),
-              NavigationDestination(
-                selectedIcon: Icon(Icons.star),
-                icon: Icon(Icons.star_border_outlined),
-                label: 'Favorites',
-              ),
-            ],
-          ),
-        ),
+        valueListenable: cubit.isSearching,
+        builder: (context, isSearching, child) {
+          return isSearching
+              ? const SizedBox.shrink()
+              : ValueListenableBuilder(
+                  valueListenable: cubit.selectedIndex,
+                  builder: (context, value, child) => NavigationBarTheme(
+                    data: NavigationBarThemeData(
+                      labelTextStyle: WidgetStatePropertyAll(
+                        textTheme.labelLarge,
+                      ),
+                    ),
+                    child: NavigationBar(
+                      selectedIndex: value,
+                      onDestinationSelected: (value) async {
+                        await cubit.onDestinationSelected(
+                          value: value,
+                          context: context,
+                        );
+                      },
+                      destinations: const [
+                        NavigationDestination(
+                          selectedIcon: Icon(Icons.person),
+                          icon: Icon(Icons.person_outlined),
+                          label: 'Contacts',
+                        ),
+                        NavigationDestination(
+                          selectedIcon: Icon(Icons.star),
+                          icon: Icon(Icons.star_border_outlined),
+                          label: 'Favorites',
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+        },
       ),
       body: child,
     );

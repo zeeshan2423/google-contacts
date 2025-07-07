@@ -6,6 +6,7 @@ class NavigationCubit extends Cubit<NavigationState> {
   NavigationCubit() : super(NavigationInitial());
 
   final selectedIndex = ValueNotifier<int>(0);
+  final isSearching = ValueNotifier<bool>(false);
 
   Future<void> onDestinationSelected({
     required int value,

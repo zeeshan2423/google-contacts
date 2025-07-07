@@ -5,6 +5,8 @@ class ContactsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.contactsCubit;
+    final navigationCubit = context.navigationCubit;
     final colorScheme = context.theme.colorScheme;
     final textTheme = context.theme.textTheme;
 
@@ -71,9 +73,14 @@ class ContactsPage extends StatelessWidget {
                         ),
                       );
                     case ContactsSuccess:
-                      final contacts = (state! as ContactsSuccess).contacts;
+                      final contacts = (state as ContactsSuccess).contacts;
                       if (contacts.isEmpty) {
-                        return _buildNoContacts(textTheme, colorScheme);
+                        return _buildNoContacts(
+                          textTheme,
+                          colorScheme,
+                          cubit,
+                          navigationCubit,
+                        );
                       } else {
                         return Expanded(
                           child: CustomScrollView(
@@ -83,6 +90,8 @@ class ContactsPage extends StatelessWidget {
                                 delegate: _SliverSearchBarDelegate(
                                   colorScheme,
                                   textTheme,
+                                  cubit,
+                                  navigationCubit,
                                 ),
                               ),
                               ...groupContacts(contacts).entries
@@ -186,7 +195,12 @@ class ContactsPage extends StatelessWidget {
                         );
                       }
                     default:
-                      return _buildNoContacts(textTheme, colorScheme);
+                      return _buildNoContacts(
+                        textTheme,
+                        colorScheme,
+                        cubit,
+                        navigationCubit,
+                      );
                   }
                 },
               ),
@@ -197,7 +211,12 @@ class ContactsPage extends StatelessWidget {
     );
   }
 
-  Expanded _buildNoContacts(TextTheme textTheme, ColorScheme colorScheme) {
+  Expanded _buildNoContacts(
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+    ContactsCubit cubit,
+    NavigationCubit navigationCubit,
+  ) {
     return Expanded(
       child: CustomScrollView(
         slivers: [
@@ -206,6 +225,8 @@ class ContactsPage extends StatelessWidget {
             delegate: _SliverSearchBarDelegate(
               colorScheme,
               textTheme,
+              cubit,
+              navigationCubit,
             ),
           ),
           SliverFillRemaining(
@@ -277,10 +298,17 @@ class _SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
 }
 
 class _SliverSearchBarDelegate extends SliverPersistentHeaderDelegate {
-  _SliverSearchBarDelegate(this.colorScheme, this.textTheme);
+  _SliverSearchBarDelegate(
+    this.colorScheme,
+    this.textTheme,
+    this.cubit,
+    this.navigationCubit,
+  );
 
   final ColorScheme colorScheme;
   final TextTheme textTheme;
+  final ContactsCubit cubit;
+  final NavigationCubit navigationCubit;
 
   @override
   Widget build(
@@ -293,10 +321,16 @@ class _SliverSearchBarDelegate extends SliverPersistentHeaderDelegate {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: GestureDetector(
         onTap: () async {
+          navigationCubit.isSearching.value = true;
           await showSearch(
             context: context,
-            delegate: ContactsSearchDelegate(),
+            delegate: ContactsSearchDelegate(
+              cubit: cubit,
+              navigationCubit: navigationCubit,
+            ),
+            query: cubit.searchController.text,
           );
+          navigationCubit.isSearching.value = false;
         },
         child: Container(
           height: 48,

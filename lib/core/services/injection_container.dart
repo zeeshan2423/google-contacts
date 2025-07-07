@@ -4,9 +4,12 @@ final GetIt sl = GetIt.instance;
 
 Future<void> init() async {
   sl
-    ..registerFactory(NavigationCubit.new)
-    ..registerFactory(() => ContactsCubit(getContacts: sl()))
+    ..registerLazySingleton(NavigationCubit.new)
+    ..registerFactory(
+      () => ContactsCubit(getContacts: sl(), searchContacts: sl()),
+    )
     ..registerLazySingleton(() => GetContacts(sl()))
+    ..registerLazySingleton(() => SearchContacts(sl()))
     ..registerLazySingleton<ContactsRepository>(
       () => ContactsRepositoryImpl(sl()),
     )
@@ -26,5 +29,6 @@ Future<void> init() async {
     ..registerLazySingleton(() => DeleteContact(sl()))
     ..registerLazySingleton<ContactDetailRepository>(
       () => ContactDetailRepositoryImpl(sl()),
-    );
+    )
+    ..registerFactory(() => FavoritesCubit(getContacts: sl()));
 }

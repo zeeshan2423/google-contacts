@@ -19,6 +19,10 @@ final class CreateContactSuccess extends CreateContactState {
   const CreateContactSuccess();
 }
 
+final class EditContactSuccess extends CreateContactState {
+  const EditContactSuccess();
+}
+
 final class CreateContactFailure extends CreateContactState {
   const CreateContactFailure(this.message);
 

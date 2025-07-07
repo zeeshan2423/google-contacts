@@ -61,6 +61,7 @@ class AppWidgets {
     required TextEditingController controller,
     FocusNode? focusNode,
     String? selectedDialCode,
+    void Function(CountryCode)? onChanged,
   }) {
     final textTheme = context.theme.textTheme;
     final colorScheme = context.theme.colorScheme;
@@ -189,10 +190,8 @@ class AppWidgets {
                     ],
                   ),
                 ),
-                onChanged: (e) {
-                  selectedDialCode = e.dialCode;
-                },
-                initialSelection: 'IN',
+                onChanged: onChanged,
+                initialSelection: selectedDialCode ?? 'IN',
                 favorite: const ['+91'],
                 flagWidth: 16,
                 showDropDownButton: true,

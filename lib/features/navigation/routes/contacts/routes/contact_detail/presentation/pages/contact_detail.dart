@@ -51,6 +51,12 @@ class ContactDetailPage extends StatelessWidget {
                 expandedHeight: 372,
                 backgroundColor: colorScheme.surface,
                 surfaceTintColor: colorScheme.surface,
+                leading: IconButton(
+                  onPressed: () {
+                    context.goNamed(PAGES.contacts.screenName);
+                  },
+                  icon: const Icon(Icons.arrow_back),
+                ),
                 actions: [
                   IconButton(
                     onPressed: () {
@@ -123,7 +129,9 @@ class ContactDetailPage extends StatelessWidget {
                               : null,
                           child: Text(
                             fullName.isEmpty
-                                ? (contact.phoneNumber ?? '')
+                                ? (contact.phoneNumber ?? '').isNotEmpty
+                                      ? (contact.phoneNumber ?? '')
+                                      : '(No name)'
                                 : fullName,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -302,7 +310,12 @@ class ContactDetailPage extends StatelessWidget {
                               else
                                 ListTile(
                                   dense: true,
-                                  onTap: () {},
+                                  onTap: () {
+                                    context.goNamed(
+                                      PAGES.createContact.screenName,
+                                      extra: {'contact': contact},
+                                    );
+                                  },
                                   title: Text(
                                     'Add phone number',
                                     style: textTheme.titleMedium?.copyWith(
@@ -325,7 +338,12 @@ class ContactDetailPage extends StatelessWidget {
                               else
                                 ListTile(
                                   dense: true,
-                                  onTap: () {},
+                                  onTap: () {
+                                    context.goNamed(
+                                      PAGES.createContact.screenName,
+                                      extra: {'contact': contact},
+                                    );
+                                  },
                                   title: Text(
                                     'Add email',
                                     style: textTheme.titleMedium?.copyWith(
@@ -379,20 +397,52 @@ class ContactDetailPage extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 16),
-                                if ((contact.birthday ?? '').isNotEmpty)
-                                  ListTile(
-                                    dense: true,
-                                    onTap: () {},
-                                    title: Text(
-                                      DateFormat('MMMM d, yyyy').format(
-                                        DateFormat('M/d/yy').parse(
-                                          contact.birthday ?? '',
+                                if ((contact.birthday ?? '').trim().isNotEmpty)
+                                  Builder(
+                                    builder: (context) {
+                                      final birthdayStr = contact.birthday!
+                                          .trim();
+                                      DateTime? parsedDate;
+                                      var displayFormat = 'MMMM d';
+
+                                      final formatsToTry = [
+                                        'M/d/yy',
+                                        'MMMM d',
+                                        'MMMM d, yyyy',
+                                      ];
+
+                                      for (final format in formatsToTry) {
+                                        try {
+                                          parsedDate = DateFormat(
+                                            format,
+                                          ).parseStrict(birthdayStr);
+                                          if (format.contains('y')) {
+                                            displayFormat = 'MMMM d, yyyy';
+                                          }
+                                          break;
+                                        } on Exception catch (_) {}
+                                      }
+
+                                      if (parsedDate == null) {
+                                        return const SizedBox.shrink();
+                                      }
+
+                                      return ListTile(
+                                        dense: true,
+                                        onTap: () {},
+                                        leading: const Icon(
+                                          Icons.cake_outlined,
                                         ),
-                                      ),
-                                    ),
-                                    leading: const Icon(Icons.cake_outlined),
-                                    subtitle: const Text('Phone'),
+                                        title: Text(
+                                          DateFormat(
+                                            displayFormat,
+                                          ).format(parsedDate),
+                                        ),
+                                        subtitle: const Text('Birthday'),
+                                      );
+                                    },
                                   ),
+
                                 if ((contact.notes ?? '').isNotEmpty)
                                   ListTile(
                                     dense: true,
@@ -511,6 +561,10 @@ class ContactDetailPage extends StatelessWidget {
   ) {
     return AlertDialog(
       title: const Text('Delete contact?'),
+      actionsPadding: const EdgeInsets.only(
+        bottom: 12,
+        right: 12,
+      ),
       content: Text(
         'This contact will be permanently deleted from your device',
         style: textTheme.labelMedium,

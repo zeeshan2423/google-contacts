@@ -149,16 +149,28 @@ class ContactsPage extends StatelessWidget {
                                                         ),
                                                       ),
                                               ),
-
                                               title: Text(
                                                 fullName.isEmpty
-                                                    ? contact.phoneNumber ?? ''
+                                                    ? (contact.phoneNumber ??
+                                                                  '')
+                                                              .isNotEmpty
+                                                          ? contact.phoneNumber ??
+                                                                ''
+                                                          : '(No name)'
                                                     : fullName,
                                               ),
+                                              titleTextStyle: textTheme
+                                                  .titleMedium
+                                                  ?.copyWith(
+                                                    color:
+                                                        colorScheme.onSurface,
+                                                  ),
                                               subtitle:
-                                                  fullName.isNotEmpty &&
-                                                      contact.phoneNumber !=
-                                                          null
+                                                  (fullName.isNotEmpty &&
+                                                      (contact
+                                                              .phoneNumber
+                                                              ?.isNotEmpty ??
+                                                          false))
                                                   ? Text(contact.phoneNumber!)
                                                   : null,
                                             );

@@ -37,7 +37,23 @@ class CreateContactRepositoryImpl implements CreateContactRepository {
   ResultVoid<void> updateContact({required Contact contact}) async {
     try {
       final result = await _localDataSource.updateContact(
-        ContactModel.fromJson(contact.toString()),
+        ContactModel(
+          id: contact.id,
+          createdAt: contact.createdAt,
+          updatedAt: contact.updatedAt,
+          firstName: contact.firstName,
+          middleName: contact.middleName,
+          surname: contact.surname,
+          phoneNumber: contact.phoneNumber,
+          email: contact.email,
+          birthday: contact.birthday,
+          address: contact.address,
+          company: contact.company,
+          title: contact.title,
+          department: contact.department,
+          notes: contact.notes,
+          isFavorite: contact.isFavorite,
+        ),
       );
       return Right(result);
     } on ServerException catch (e) {

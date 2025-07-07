@@ -10,13 +10,23 @@ class CreateContactPage extends StatelessWidget {
     final cubit = context.createContactCubit;
     final colorScheme = context.theme.colorScheme;
     final textTheme = context.theme.textTheme;
+    if (contact != null) {
+      cubit.populateFieldsFromContact(contact!);
+    }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create contact'),
+        title: Text(contact == null ? 'Create contact' : 'Edit Contact'),
         leading: IconButton(
           onPressed: () {
-            context.pop();
+            if (contact == null) {
+              context.pop();
+            } else {
+              context.goNamed(
+                PAGES.contactDetail.screenName,
+                extra: {'contact': contact},
+              );
+            }
           },
           icon: const Icon(Icons.clear),
         ),
@@ -41,9 +51,38 @@ class CreateContactPage extends StatelessWidget {
                             cubit.addressController.text.isEmpty &&
                             cubit.jobTitleController.text.isEmpty &&
                             cubit.departmentController.text.isEmpty) {
-                          context.pop();
+                          if (contact == null) {
+                            context.pop();
+                          } else {
+                            await showDialog<AlertDialog>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                contentPadding: const EdgeInsets.all(24),
+                                actionsPadding: const EdgeInsets.only(
+                                  bottom: 12,
+                                  right: 12,
+                                ),
+                                content: Text(
+                                  'Add info to save as a contact.',
+                                  style: textTheme.labelLarge,
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      context.pop();
+                                    },
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
                         } else {
-                          await cubit.addNewContact();
+                          if (contact == null) {
+                            await cubit.addNewContact();
+                          } else {
+                            await cubit.editContact(contact!);
+                          }
                         }
                       },
                 child: Text(
@@ -67,7 +106,8 @@ class CreateContactPage extends StatelessWidget {
               listenWhen: (previous, current) =>
                   current is CreateContactInProgress ||
                   current is CreateContactFailure ||
-                  current is CreateContactSuccess,
+                  current is CreateContactSuccess ||
+                  current is EditContactSuccess,
               buildWhen: (previous, current) =>
                   current is! CreateContactInProgress,
               listener: (context, state) {
@@ -77,7 +117,8 @@ class CreateContactPage extends StatelessWidget {
                     text: state.message,
                   );
                 }
-                if (state is CreateContactSuccess) {
+                if (state is CreateContactSuccess ||
+                    state is EditContactSuccess) {
                   final fullName =
                       [
                             cubit.firstNameController.text,
@@ -88,7 +129,10 @@ class CreateContactPage extends StatelessWidget {
                             (part) => part.trim().isNotEmpty,
                           )
                           .join(' ');
-                  context.pop();
+                  context.goNamed(
+                    PAGES.contactDetail.screenName,
+                    extra: {'contact': cubit.contact},
+                  );
                   AppWidgets.customSnackBar(
                     context: context,
                     text: '${fullName.isEmpty ? 'Contact' : fullName} saved',
@@ -260,6 +304,9 @@ class CreateContactPage extends StatelessWidget {
                         controller: cubit.phoneController,
                         focusNode: cubit.phoneNode,
                         selectedDialCode: cubit.selectedDialCode,
+                        onChanged: (e) {
+                          cubit.selectedDialCode = e.dialCode;
+                        },
                       ),
                     ),
                     Padding(

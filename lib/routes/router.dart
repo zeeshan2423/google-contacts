@@ -35,19 +35,20 @@ class AppRouter {
                     path: PAGES.createContact.screenPath,
                     name: PAGES.createContact.screenName,
                     parentNavigatorKey: _rootNavigator,
-                    pageBuilder: (context, state) =>
-                        buildPageWithDefaultTransition(
-                          child: BlocProvider.value(
-                            value: sl<CreateContactCubit>(),
-                            child: CreateContactPage(
-                              key: state.pageKey,
-                              contact:
-                                  (state.extra!
-                                          as Map<String, dynamic>)['contact']
-                                      as Contact,
-                            ),
+                    pageBuilder: (context, state) {
+                      final extra = state.extra as Map<String, dynamic>?;
+                      final contact = extra?['contact'] as Contact?;
+
+                      return buildPageWithDefaultTransition(
+                        child: BlocProvider.value(
+                          value: sl<CreateContactCubit>(),
+                          child: CreateContactPage(
+                            key: state.pageKey,
+                            contact: contact,
                           ),
                         ),
+                      );
+                    },
                   ),
                   GoRoute(
                     path: PAGES.contactDetail.screenPath,
